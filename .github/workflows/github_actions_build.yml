@@ -71,10 +71,9 @@ jobs:
             - name: Upload Release Assets (ZIP & Plugin Info)
               uses: softprops/action-gh-release@v1
               with:
+                  tag_name: v${{ env.PLUGIN_VERSION }}
                   files: |
                       release/${{ env.ASSET_NAME }}
                       plugin_info.json
-                  tag_name: v${{ env.PLUGIN_VERSION }}
-                  ref: "refs/tags/v${{ env.PLUGIN_VERSION }}"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
