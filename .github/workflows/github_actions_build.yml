@@ -16,7 +16,6 @@ jobs:
               with:
                   fetch-depth: 0  # すべての履歴を取得
 
-
             - name: Setup Node.js
               uses: actions/setup-node@v3
               with:
@@ -48,6 +47,13 @@ jobs:
               run: |
                   mkdir release
                   zip -r "release/${{ env.ASSET_NAME }}" dist
+
+            - name: Create Git Tag  # ★ 追加するステップ
+              run: |
+                  git config --global user.name "github-actions"
+                  git config --global user.email "github-actions@github.com"
+                  git tag -a "v${{ env.PLUGIN_VERSION }}" -m "Release v${{ env.PLUGIN_VERSION }}"
+                  git push origin "v${{ env.PLUGIN_VERSION }}"
 
             - name: Create GitHub Release
               id: create_release
