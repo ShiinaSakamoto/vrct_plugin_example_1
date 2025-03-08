@@ -31,17 +31,16 @@ jobs:
             - name: Extract Plugin Info
               id: plugin_info
               run: |
-                  # plugin_info.json から必要な情報を取得
+                  # plugin_info.json の内容を環境変数にセット
                   plugin_version=$(jq -r '.plugin_version' plugin_info.json)
                   asset_name=$(jq -r '.asset_name' plugin_info.json)
+                  plugin_info=$(cat plugin_info.json)
 
-                  # 環境変数に設定
                   echo "PLUGIN_VERSION=$plugin_version" >> $GITHUB_ENV
                   echo "ASSET_NAME=$asset_name" >> $GITHUB_ENV
-
-                  # GitHub Actions の出力としても設定
-                  echo "plugin_version=$plugin_version" >> $GITHUB_OUTPUT
-                  echo "asset_name=$asset_name" >> $GITHUB_OUTPUT
+                  echo "PLUGIN_INFO<<EOF" >> $GITHUB_ENV
+                  echo "$plugin_info" >> $GITHUB_ENV
+                  echo "EOF" >> $GITHUB_ENV
 
             - name: Create ZIP Package
               run: |
@@ -64,7 +63,7 @@ jobs:
                   body: |
                       Plugin Info:
                       ```
-                      $(cat plugin_info.json)
+                      ${{ env.PLUGIN_INFO }}
                       ```
                   draft: false
                   prerelease: false
