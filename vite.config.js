@@ -14,7 +14,6 @@ export default defineConfig({
             formats: ["es"]
         },
         rollupOptions: {
-            // React をバンドルしないようにする
             external: ["react", "react-dom"],
             treeshake: false,
             output: {
