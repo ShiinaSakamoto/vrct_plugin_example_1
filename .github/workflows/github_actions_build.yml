@@ -1,0 +1,68 @@
+name: Build and Release Plugin
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    build_and_release:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v3
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "16"
+                  cache: "npm"
+
+            - name: Install Dependencies
+              run: npm install
+
+            - name: Build Plugin
+              run: npm run build
+
+            - name: Extract Plugin Info
+              id: plugin_info
+              run: |
+                  # plugin_info.json から必要な情報を取得
+                  plugin_version=$(jq -r '.plugin_version' plugin_info.json)
+                  asset_name=$(jq -r '.asset_name' plugin_info.json)
+
+                  # 環境変数に設定
+                  echo "PLUGIN_VERSION=$plugin_version" >> $GITHUB_ENV
+                  echo "ASSET_NAME=$asset_name" >> $GITHUB_ENV
+
+                  # GitHub Actions の出力としても設定
+                  echo "plugin_version=$plugin_version" >> $GITHUB_OUTPUT
+                  echo "asset_name=$asset_name" >> $GITHUB_OUTPUT
+
+            - name: Create ZIP Package
+              run: |
+                  mkdir release
+                  zip -r "release/${{ env.ASSET_NAME }}" dist
+
+            - name: Create GitHub Release
+              id: create_release
+              uses: ncipollo/release-action@v1
+              with:
+                  tag: v${{ env.PLUGIN_VERSION }}
+                  name: Release v${{ env.PLUGIN_VERSION }}
+                  body: |
+                      Plugin Info:
+                      ```
+                      $(cat plugin_info.json)
+                      ```
+                  draft: false
+                  prerelease: false
+
+            - name: Upload Release Assets (ZIP & Plugin Info)
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: |
+                      release/${{ env.ASSET_NAME }}
+                      plugin_info.json
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
