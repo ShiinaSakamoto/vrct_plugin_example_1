@@ -14,7 +14,7 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v3
               with:
-                  fetch-depth: 0  # すべての履歴を取得
+                  fetch-depth: 0
 
             - name: Setup Node.js
               uses: actions/setup-node@v3
@@ -31,7 +31,6 @@ jobs:
             - name: Extract Plugin Info
               id: plugin_info
               run: |
-                  # plugin_info.json の内容を環境変数にセット
                   plugin_version=$(jq -r '.plugin_version' plugin_info.json)
                   asset_name=$(jq -r '.asset_name' plugin_info.json)
                   plugin_info=$(cat plugin_info.json)
@@ -45,7 +44,7 @@ jobs:
             - name: Create ZIP Package
               run: |
                   mkdir release
-                  zip -r "release/${{ env.ASSET_NAME }}" dist
+                  cd dist && zip -r "../release/${{ env.ASSET_NAME }}" .
 
             - name: Create Git Tag
               run: |

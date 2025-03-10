@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+
 import { initStore } from "./store/store";
 import { MainContainer } from "./main_container/MainContainer";
 
