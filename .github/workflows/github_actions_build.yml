@@ -43,15 +43,16 @@ jobs:
 
             - name: Create ZIP Package
               run: |
-                  mkdir release
+                  mkdir -p release
                   cd dist && zip -r "../release/${{ env.ASSET_NAME }}" .
+                  zip -j -u release/${{ env.ASSET_NAME }} ../plugin_info.json
 
             - name: Create Git Tag
               run: |
                   git config --global user.name "github-actions"
                   git config --global user.email "github-actions@github.com"
                   git tag -a "v${{ env.PLUGIN_VERSION }}" -m "Release v${{ env.PLUGIN_VERSION }}"
-                  git push origin "v${{ env.PLUGIN_VERSION }}"
+                  git push origin --tags
 
             - name: Create GitHub Release
               id: create_release
